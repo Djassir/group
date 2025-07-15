@@ -1,0 +1,375 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8" />
+  <title>DJASSIRFAMILY - Blood Group Detection</title>
+  <style>
+    * {
+      box-sizing: border-box;
+    }
+    body {
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      margin: 0;
+      padding: 0;
+      background: linear-gradient(135deg, #a1c4fd 0%, #c2e9fb 100%);
+      color: #222;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+    }
+    a {
+      color: #1a73e8;
+      text-decoration: none;
+      transition: color 0.3s ease;
+    }
+    a:hover {
+      color: #0c47b7;
+      text-decoration: underline;
+    }
+    nav {
+      background-color: rgba(0,102,153,0.9);
+      color: white;
+      padding: 18px 0;
+      box-shadow: 0 2px 10px rgba(0,0,0,0.15);
+      position: sticky;
+      top: 0;
+      z-index: 1000;
+      display: flex;
+      justify-content: center;
+      gap: 40px;
+      font-size: 20px;
+      font-weight: 700;
+      user-select: none;
+    }
+    nav a {
+      color: white;
+      font-weight: 700;
+      cursor: pointer;
+      padding: 5px 12px;
+      border-radius: 6px;
+      transition: background-color 0.3s ease;
+    }
+    nav a.active, nav a:hover {
+      background-color: rgba(255,255,255,0.2);
+      text-decoration: none;
+    }
+    main {
+      flex-grow: 1;
+      display: flex;
+      justify-content: center;
+      padding: 40px 20px;
+    }
+    section {
+      max-width: 700px;
+      width: 100%;
+      background-color: #ffffffcc;
+      border-radius: 16px;
+      box-shadow: 0 8px 25px rgba(0,0,0,0.12);
+      padding: 40px 50px;
+      display: none;
+      backdrop-filter: blur(8px);
+      -webkit-backdrop-filter: blur(8px);
+      transition: opacity 0.4s ease;
+    }
+    section.active {
+      display: block;
+    }
+    h1, h2 {
+      color: #004d80;
+      text-align: center;
+      margin-bottom: 25px;
+      font-weight: 900;
+      letter-spacing: 1.2px;
+    }
+    p {
+      font-size: 18px;
+      line-height: 1.6;
+      text-align: center;
+      max-width: 600px;
+      margin: 0 auto 20px auto;
+      color: #333;
+    }
+    label {
+      display: block;
+      margin-top: 18px;
+      font-weight: 600;
+      font-size: 16px;
+      color: #004d80;
+    }
+    input, select, button {
+      width: 100%;
+      padding: 14px 15px;
+      margin-top: 8px;
+      font-size: 17px;
+      border-radius: 10px;
+      border: 1.8px solid #ccc;
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      transition: border-color 0.3s ease;
+    }
+    input:focus, select:focus {
+      border-color: #0077cc;
+      outline: none;
+      box-shadow: 0 0 8px #a3d2ff;
+    }
+    button {
+      background-color: #0077cc;
+      color: white;
+      font-weight: 700;
+      cursor: pointer;
+      margin-top: 30px;
+      border: none;
+      transition: background-color 0.3s ease;
+      letter-spacing: 1.1px;
+      box-shadow: 0 4px 14px rgba(0,119,204,0.6);
+    }
+    button:hover {
+      background-color: #005a99;
+      box-shadow: 0 6px 20px rgba(0,90,153,0.8);
+    }
+    #preview {
+      max-width: 100%;
+      margin-top: 20px;
+      display: none;
+      border-radius: 14px;
+      border: 1.8px solid #ccc;
+      box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+    }
+    #loader {
+      display: none;
+      font-style: italic;
+      color: #555;
+      margin-top: 14px;
+      text-align: center;
+      font-weight: 600;
+    }
+    .result {
+      margin-top: 25px;
+      font-size: 20px;
+      color: #0a7d00;
+      font-weight: 700;
+      text-align: center;
+    }
+    .eligibility {
+      margin-top: 18px;
+      font-size: 18px;
+      color: #0055a5;
+      font-weight: 700;
+      text-align: center;
+    }
+    .not-eligible {
+      color: #cc0000;
+    }
+    .social-links {
+      margin-top: 18px;
+      text-align: center;
+    }
+    .social-links a {
+      margin: 0 14px;
+      font-weight: 700;
+      color: #0077cc;
+      font-size: 20px;
+      transition: color 0.3s ease;
+    }
+    .social-links a:hover {
+      color: #004d80;
+    }
+    footer {
+      background-color: #004d80;
+      color: #cce6ff;
+      text-align: center;
+      padding: 18px 15px;
+      font-size: 15px;
+      user-select: none;
+      box-shadow: 0 -2px 8px rgba(0,0,0,0.15);
+      letter-spacing: 0.5px;
+    }
+    @media (max-width: 720px) {
+      main {
+        padding: 30px 15px;
+      }
+      section {
+        padding: 30px 25px;
+        margin: 0 5px;
+      }
+      nav {
+        flex-direction: column;
+        gap: 12px;
+        font-size: 18px;
+      }
+      .social-links a {
+        font-size: 18px;
+        margin: 0 8px;
+      }
+    }
+  </style>
+</head>
+<body>
+
+  <nav>
+    <a href="#" data-section="home" class="active">Maison</a>
+    <a href="#" data-section="form">Blood Group Detection</a>
+    <a href="#" data-section="about">À propos</a>
+    <a href="#" data-section="contact">Contact</a>
+  </nav>
+
+  <main>
+    <section id="home" class="active">
+      <h1>Bienvenue chez DJASSIRFAMILY</h1>
+      <p>
+        Notre mission est d'offrir un service fiable de détection du groupe sanguin par IA à partir d'images microscopiques.  
+        Téléchargez votre image, laissez notre système intelligent analyser votre groupe sanguin, et postulez si vous êtes éligible à un don ou autre opportunité.
+      </p>
+    </section>
+
+    <section id="form">
+      <h2>🔬 Microscopic Blood Group Detection</h2>
+      <form id="bloodForm">
+        <label for="name">Nom complet</label>
+        <input type="text" id="name" placeholder="Entrez votre nom complet" required />
+        <label for="age">Âge</label>
+        <input type="number" id="age" placeholder="Entrez votre âge" required min="0" max="120"/>
+        <label for="gender">Genre</label>
+        <select id="gender" required>
+          <option value="">-- Sélectionnez --</option>
+          <option>Homme</option>
+          <option>Femme</option>
+          <option>Autre</option>
+        </select>
+        <label for="imageInput">Téléchargez l'image microscopique du test sanguin</label>
+        <input type="file" id="imageInput" accept="image/*" required />
+        <p style="font-style: italic; color: gray; margin-top:4px;">
+          (Exemple : image montrant clairement le groupe sanguin comme A+, O−)
+        </p>
+        <div id="loader">⏳ Analyse en cours avec l'IA...</div>
+        <img id="preview" src="#" alt="Prévisualisation" />
+        <button type="submit">Analyser et vérifier l'éligibilité</button>
+        <div class="result" id="result"></div>
+        <div class="eligibility" id="eligibility"></div>
+      </form>
+    </section>
+
+    <section id="about">
+      <h2>À propos de DJASSIRFAMILY</h2>
+      <p>
+        DJASSIRFAMILY est une entreprise dédiée à l'intégration de la technologie IA dans le domaine médical.  
+        Notre système de détection automatique du groupe sanguin facilite la vie des patients et des professionnels en offrant une vérification rapide et fiable grâce à une simple image microscopique.
+      </p>
+    </section>
+
+    <section id="contact">
+      <h2>Contactez-nous</h2>
+      <p>
+        Pour toute question, suggestion ou demande de partenariat, écrivez-nous à :<br />
+        <a href="mailto:mdjassirfadoul@gmail.com">mdjassirfadoul@gmail.com</a><br /><br />
+        Ou contactez-nous via WhatsApp au : <a href="https://wa.me/250795377228" target="_blank" rel="noopener">+250 79 537 7228</a>
+      </p>
+      <div class="social-links">
+        <a href="https://www.facebook.com/yourfacebookprofile" target="_blank" rel="noopener" aria-label="Facebook">Facebook</a> |
+        <a href="https://www.instagram.com/yourinstagramprofile" target="_blank" rel="noopener" aria-label="Instagram">Instagram</a>
+      </div>
+    </section>
+  </main>
+
+  <footer>
+    &copy; 2025 DJASSIRFAMILY. Tous droits réservés.
+  </footer>
+
+  <script src="https://cdn.jsdelivr.net/npm/tesseract.js@4"></script>
+  <script>
+    const navLinks = document.querySelectorAll('nav a');
+    const sections = document.querySelectorAll('main section');
+
+    navLinks.forEach(link => {
+      link.addEventListener('click', (e) => {
+        e.preventDefault();
+        const target = link.getAttribute('data-section');
+
+        navLinks.forEach(l => l.classList.remove('active'));
+        link.classList.add('active');
+
+        sections.forEach(section => {
+          if(section.id === target) {
+            section.classList.add('active');
+          } else {
+            section.classList.remove('active');
+          }
+        });
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+      });
+    });
+
+    const form = document.getElementById('bloodForm');
+    const imageInput = document.getElementById('imageInput');
+    const preview = document.getElementById('preview');
+    const loader = document.getElementById('loader');
+    const resultDiv = document.getElementById('result');
+    const eligibilityDiv = document.getElementById('eligibility');
+
+    form.addEventListener('submit', function (e) {
+      e.preventDefault();
+
+      if (!imageInput.files[0]) {
+        alert('Veuillez sélectionner une image.');
+        return;
+      }
+
+      const file = imageInput.files[0];
+      if (!file.type.startsWith('image/')) {
+        alert('Le fichier doit être une image.');
+        return;
+      }
+
+      const reader = new FileReader();
+      reader.onload = function (e) {
+        const imageData = e.target.result;
+        preview.src = imageData;
+        preview.style.display = 'block';
+        loader.style.display = 'block';
+        resultDiv.textContent = '';
+        eligibilityDiv.textContent = '';
+
+        Tesseract.recognize(imageData, 'eng')
+          .then(({ data: { text } }) => {
+            loader.style.display = 'none';
+
+            const upperText = text.toUpperCase();
+            const match = upperText.match(/\b(?:A|B|AB|O)[+-]\b/);
+            const group = match ? match[0] : null;
+
+            if (group) {
+              const name = document.getElementById('name').value;
+              const age = parseInt(document.getElementById('age').value);
+
+              resultDiv.innerHTML = `✅ <strong>${name}</strong>, votre groupe sanguin détecté est : <strong>${group}</strong>`;
+
+              let eligible = false;
+              let message = "";
+
+              if (age < 18 || age > 60) {
+                message = "❌ Vous devez avoir entre 18 et 60 ans pour postuler.";
+                eligibilityDiv.className = "eligibility not-eligible";
+              } else if (group === "O−") {
+                eligible = true;
+                message = "✅ Vous êtes un donneur universel. Votre candidature est vivement encouragée !";
+              } else {
+                eligible = true;
+                message = "✅ Vous êtes éligible à postuler selon votre âge et groupe sanguin.";
+              }
+
+              eligibilityDiv.textContent = message;
+              eligibilityDiv.className = eligible ? "eligibility" : "eligibility not-eligible";
+            } else {
+              resultDiv.textContent = "❌ Impossible de détecter un groupe sanguin valide sur l'image.";
+            }
+          })
+          .catch(err => {
+            loader.style.display = 'none';
+            resultDiv.textContent = "❌ L'analyse IA a échoué. Veuillez réessayer avec une autre image.";
+            console.error(err);
+          });
+      };
+      reader.readAsDataURL(file);
+    });
+  </script>
+</body>
+</html>
